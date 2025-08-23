@@ -18,13 +18,16 @@ function BookingForm({ selectedBed, onConfirm, onCancel }) {
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
+  
+  
   // Handle form submit (when user clicks "Confirm Booking")
   const handleSubmit = (e) => {
     e.preventDefault(); // prevent page reload
+    
     const age = parseInt(formData.age, 10); // convert age from string → number
 
     // Validation: Only allow age greater than 10
-    if (age <= 10) {
+    if ( age <= 10 ) {
       setError("❌ Booking allowed only for age above 10 years.");
       return;
     }

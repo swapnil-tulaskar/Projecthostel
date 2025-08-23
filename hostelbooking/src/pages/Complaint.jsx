@@ -11,7 +11,16 @@ function Complaint({ complaints, setComplaints }) {
     // Both name and message are required
     if (name.trim().length === 0 || message.trim().length === 0) return;
 
-    setComplaints([...complaints, { name: name.trim(), message: message.trim() }]);
+    // Get current date and time
+    const now = new Date();
+    const timestamp = now.toLocaleString(); // Format: "8/22/2025, 3:00:00 PM"
+
+    // Add complaint with timestamp
+    setComplaints([
+      ...complaints,
+      { name: name.trim(), message: message.trim(), timestamp },
+    ]);
+
     setName("");
     setMessage("");
     setSubmitted(true);
@@ -19,8 +28,18 @@ function Complaint({ complaints, setComplaints }) {
 
   return (
     <div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
-      <div style={{ width: "400px", border: "1px solid #ccc", padding: "20px", borderRadius: "8px", background: "#f9f9f9" }}>
-        <h1 style={{ fontSize: "20px", marginBottom: "15px" }}>📝 Complaint & Suggestion</h1>
+      <div
+        style={{
+          width: "400px",
+          border: "1px solid #ccc",
+          padding: "20px",
+          borderRadius: "8px",
+          background: "#f9f9f9",
+        }}
+      >
+        <h1 style={{ fontSize: "20px", marginBottom: "15px" }}>
+          📝 Complaint & Suggestion
+        </h1>
         {submitted && <p style={{ color: "green" }}>Your complaint has been submitted!</p>}
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: "10px" }}>

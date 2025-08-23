@@ -1,0 +1,11 @@
+.nav-link {
+  color:whitesmoke;
+  text-decoration: none;
+  font-size: 18px;
+  transition: 0.3s;
+}
+
+.nav-link:hover {
+  text-decoration: underline;
+  color: #e226a9; /* yellow on hover */
+}
