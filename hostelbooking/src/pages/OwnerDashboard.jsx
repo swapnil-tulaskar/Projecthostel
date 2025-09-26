@@ -2,9 +2,12 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function OwnerDashboard({ rooms, setRooms, complaints, setComplaints, setLoggedIn }) {
-  const [view, setView] = useState("occupied");
   const navigate = useNavigate();
+  const [view, setView] = useState("occupied"); // local dashboard view
 
+  // -----------------------------
+  // Bed Functions
+  // -----------------------------
   const toggleBedStatus = (roomName, bedId) => {
     const updatedRooms = rooms.map((room) => {
       if (room.room === roomName) {
@@ -22,14 +25,17 @@ function OwnerDashboard({ rooms, setRooms, complaints, setComplaints, setLoggedI
     setRooms(updatedRooms);
   };
 
-  const removeComplaint = (index) => {
-    setComplaints((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const removeAllComplaints = () => {
-    if (window.confirm("Remove all complaints?")) {
-      setComplaints([]);
-    }
+  const addBed = (roomName) => {
+    setRooms((prevRooms) =>
+      prevRooms.map((room) => {
+        if (room.room === roomName) {
+          const maxId = room.beds.length ? Math.max(...room.beds.map((b) => b.id)) : 0;
+          const newBed = { id: maxId + 1, vacant: true };
+          return { ...room, beds: [...room.beds, newBed] };
+        }
+        return room;
+      })
+    );
   };
 
   const filteredBeds = (beds) =>
@@ -37,6 +43,20 @@ function OwnerDashboard({ rooms, setRooms, complaints, setComplaints, setLoggedI
       ? beds.filter((bed) => !bed.vacant)
       : beds.filter((bed) => bed.vacant);
 
+  // -----------------------------
+  // Complaint Functions
+  // -----------------------------
+  const removeComplaint = (index) => {
+    setComplaints((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const removeAllComplaints = () => {
+    setComplaints([]);
+  };
+
+  // -----------------------------
+  // Logout
+  // -----------------------------
   const handleLogout = () => {
     setLoggedIn(false);
     navigate("/login");
@@ -44,74 +64,39 @@ function OwnerDashboard({ rooms, setRooms, complaints, setComplaints, setLoggedI
 
   return (
     <div style={{ padding: "20px" }}>
-      {/* ✅ Navbar */}
-      <nav
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "10px 20px",
-          background: "#007bff",
-          borderRadius: "8px",
-          marginBottom: "20px",
-        }}
-      >
-        <h2 style={{ color: "white" }}>🏠 Owner Dashboard</h2>
-        <div style={{ display: "flex", gap: "15px" }}>
-          <span
-            onClick={() => setView("occupied")}
-            style={{
-              color: view === "occupied" ? "yellow" : "white",
-              cursor: "pointer",
-              fontWeight: view === "occupied" ? "bold" : "normal",
-            }}
-          >
-            Occupied Beds
-          </span>
-          <span
-            onClick={() => setView("vacant")}
-            style={{
-              color: view === "vacant" ? "yellow" : "white",
-              cursor: "pointer",
-              fontWeight: view === "vacant" ? "bold" : "normal",
-            }}
-          >
-            Vacant Beds
-          </span>
-          <span
-            onClick={() => setView("complaints")}
-            style={{
-              color: view === "complaints" ? "yellow" : "white",
-              cursor: "pointer",
-              fontWeight: view === "complaints" ? "bold" : "normal",
-            }}
-          >
-            Complaints
-          </span>
-          <span
-            onClick={handleLogout}
-            style={{
-              color: "white",
-              cursor: "pointer",
-              background: "#ef4444",
-              padding: "5px 10px",
-              borderRadius: "5px",
-            }}
-          >
-            Logout
-          </span>
-        </div>
-      </nav>
+      <h1>🏠 Owner Dashboard</h1>
 
-      {/* Beds List */}
+      {/* Dashboard View Controls */}
+      <div style={{ marginBottom: "20px" }}>
+        <button onClick={() => setView("occupied")} style={buttonStyle(view === "occupied")}>
+          Occupied Beds
+        </button>
+        <button onClick={() => setView("vacant")} style={buttonStyle(view === "vacant")}>
+          Vacant Beds
+        </button>
+        <button onClick={() => setView("complaints")} style={buttonStyle(view === "complaints")}>
+          Complaints
+        </button>
+        
+      </div>
+
+      {/* -----------------------------
+          Beds View
+      ----------------------------- */}
       {(view === "occupied" || view === "vacant") &&
         rooms.map((room) => {
           const bedsToShow = filteredBeds(room.beds);
-          if (bedsToShow.length === 0) return null;
+          if (bedsToShow.length === 0 && view === "occupied") return null;
 
           return (
             <div key={room.room} style={{ marginBottom: "15px" }}>
               <h2>{room.room}</h2>
+              <button
+                onClick={() => addBed(room.room)}
+                style={{ marginBottom: "10px", padding: "5px 10px", borderRadius: "5px", background: "#22c55e", color: "white", border: "none", cursor: "pointer" }}
+              >
+                ➕ Add Bed
+              </button>
               <ul>
                 {bedsToShow.map((bed) => (
                   <li key={bed.id} style={{ marginBottom: "10px" }}>
@@ -141,59 +126,24 @@ function OwnerDashboard({ rooms, setRooms, complaints, setComplaints, setLoggedI
           );
         })}
 
-      {/* Complaints View */}
+      {/* -----------------------------
+          Complaints View
+      ----------------------------- */}
       {view === "complaints" && (
         <div>
           {complaints.length > 0 ? (
             <>
-              <button
-                onClick={removeAllComplaints}
-                style={{
-                  marginBottom: "15px",
-                  padding: "5px 10px",
-                  borderRadius: "5px",
-                  background: "#f97316",
-                  color: "white",
-                  border: "none",
-                  cursor: "pointer",
-                }}
-              >
+              <button onClick={removeAllComplaints} style={{ ...buttonStyle(false), background: "#f97316", marginBottom: "15px" }}>
                 Remove All
               </button>
-
               <ul>
                 {complaints.map((c, index) => (
-                  <li
-                    key={index}
-                    style={{
-                      marginBottom: "10px",
-                      padding: "10px",
-                      border: "1px solid #007bff",
-                      borderRadius: "8px",
-                      background: "#e0f0ff",
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
+                  <li key={index} style={complaintStyle}>
                     <div>
                       <b>{c.name}:</b> {c.message} <br />
-                      <span style={{ fontSize: "12px", color: "#555" }}>
-                        🕒 Submitted at: {c.timestamp}
-                      </span>
+                      <span style={{ fontSize: "12px", color: "#555" }}>🕒 Submitted at: {c.timestamp}</span>
                     </div>
-                    <button
-                      onClick={() => removeComplaint(index)}
-                      style={{
-                        marginLeft: "10px",
-                        padding: "5px 10px",
-                        borderRadius: "5px",
-                        background: "#ef4444",
-                        color: "white",
-                        border: "none",
-                        cursor: "pointer",
-                      }}
-                    >
+                    <button onClick={() => removeComplaint(index)} style={{ ...buttonStyle(false), background: "#ef4444" }}>
                       Remove
                     </button>
                   </li>
@@ -208,5 +158,29 @@ function OwnerDashboard({ rooms, setRooms, complaints, setComplaints, setLoggedI
     </div>
   );
 }
+
+// -----------------------------
+// Styles
+// -----------------------------
+const buttonStyle = (active) => ({
+  padding: "5px 12px",
+  marginRight: "10px",
+  borderRadius: "5px",
+  border: "none",
+  cursor: "pointer",
+  background: active ? "#2563eb" : "#3b82f6",
+  color: "white",
+});
+
+const complaintStyle = {
+  marginBottom: "10px",
+  padding: "10px",
+  border: "1px solid #007bff",
+  borderRadius: "8px",
+  background: "#e0f0ff",
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+};
 
 export default OwnerDashboard;

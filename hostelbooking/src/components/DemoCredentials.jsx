@@ -1,41 +1,35 @@
 import React from "react";
+import { demoUsers, demoPassword } from "../components/demoConfig"; // ✅ import shared config
 
 const DemoCredentials = () => {
-  const demoUsers = [
-    "owner@test.com",
-    "man@test.com",
-    "admin@test.com",
-    "guest@test.com",
-  ];
-
   return (
     <div
       style={{
-        display: "flex",
-        justifyContent: "space-between",
-        background: "#f2f2f2",
-        padding: "20px",
         marginTop: "20px",
+        padding: "20px",
+        background: "#f2f2f2",
+        borderRadius: "8px",
         fontFamily: "monospace",
       }}
     >
-      {/* Left side - usernames */}
-      <div>
-        <p>
-          <b>Accepted usernames are:</b>
-        </p>
-        {demoUsers.map((email, i) => (
-          <p key={i}>{email}</p>
-        ))}
-      </div>
-
-      {/* Right side - password */}
-      <div>
-        <p>
-          <b>Password for all users:</b>
-        </p>
-        <p>user12345</p>
-      </div>
+      <table>
+        <thead>
+          <tr>
+            <th style={{ textAlign: "left", paddingRight: "40px" }}>
+              Accepted usernames are:
+            </th>
+            <th style={{ textAlign: "left" }}>Password for all users:</th>
+          </tr>
+        </thead>
+        <tbody>
+          {demoUsers.map((email, i) => (
+            <tr key={i}>
+              <td>{email}</td>
+              <td>{demoPassword}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };

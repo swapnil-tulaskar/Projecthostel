@@ -17,7 +17,7 @@ function Login({ setLoggedIn }) {
   ];
 
   // Common password for all users
-  const demoPassword = "user12345";
+  const demoPassword = "user123";
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -75,7 +75,7 @@ function Login({ setLoggedIn }) {
       {error && <p style={{ color: "red" }}>{error}</p>}
 
       {/* Show demo credentials below form */}
-      <DemoCredentials />
+       <DemoCredentials demoUsers={demoUsers} demoPassword={demoPassword} />
     </div>
   );
 }
